@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+      "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>QUnit basic test: oo.js</title>
+<link rel="stylesheet" href="core/qunit.css" type="text/css" />
+
+<!-- Replace with development code -->
+<script src="core/jquery-1.4.2.min.js" type="text/javascript"></script>
+<script src="../js/oo.js" type="text/javascript"></script>
+
+
+<script src="core/qunit.js" type="text/javascript"></script>
+<script type="text/javascript">
+	// --- Unittest Code goes here ---
+	
+	// testing data
+	var baseLiteral = {
+		name: 'baseLiteral',
+		setName: function (name) {
+			this.name = name;
+		},
+		getName: function () {
+			return this.name;
+		},
+		getThis: function () {
+			return this;
+		}
+	};
+	
+	var subLiteral = {
+		name: 'subLiteral',
+		getName: function () {
+			return this.uber.getName() +':'+ this.name;
+		}
+	};
+	
+	
+	$(function() {
+		
+		module("Basic tests for oo");	
+		test('Module and methods exist', function() {
+			expect(4);
+			
+			ok(typeof oo === 'object', "oo module is an object");
+			ok(typeof oo.extend === 'function', "oo.extend method exists");
+			ok(typeof oo.create === 'function', "oo.create method exists");
+			ok(typeof oo.implement === 'function', "oo.implement method exists");
+			
+		});
+		test('extends method', function() {
+			expect(4);
+			
+			same(
+				baseLiteral, oo.extend({}, baseLiteral), 
+				'Copy properties to new object.'
+			);
+			
+			var toBeExtended = { name: 'toBeExtended' },
+				extended = oo.extend(toBeExtended, baseLiteral);
+				
+			
+			ok(
+				extended.name === 'baseLiteral',
+				'Target properties correctly overwritten by source properties.'
+			);
+				
+			ok(
+				toBeExtended.hasOwnProperty('getThis'),
+				'Properties copied to target are not inherited.'
+			);
+				
+			extended = oo.extend({}, baseLiteral, {name: 'extendedAgain'});
+			
+			ok(
+				extended.name === 'extendedAgain',
+				'Properties extended from multipe source objects.'
+				);
+			
+		});
+		test('create method', function() {
+			expect(3);
+			
+			var instance = oo.create(baseLiteral);
+			
+			ok(
+				baseLiteral.getName === instance.getName && !instance.hasOwnProperty('getName'), 
+				'Instance inherits methods from prototype.'
+			);
+				
+			ok(
+				instance.getThis() === instance,
+				'Prototype methods access this instance correctly.'
+			);
+				
+			ok(
+				instance.uber === baseLiteral && instance.uber.getName() === 'baseLiteral',
+				'The instance.uber property references the base object.'
+			);
+			
+				
+		});
+		test('implement method', function() {
+			expect(4);
+			
+			var instance = oo.implement(baseLiteral, {name: 'instance'});
+			
+			ok(
+				instance.getName() === 'instance',
+				'Instance property set and accessible to prototye methods.'
+			);
+			
+			var instance2 = oo.implement(baseLiteral, subLiteral);
+			
+			ok(
+				instance2.getName() === 'baseLiteral:subLiteral',
+				'Instance methods can override base and call them via uber property'
+			);
+				
+			var instance3 = oo.implement(oo.implement(baseLiteral, subLiteral), {name: 'instance3'});
+			
+			ok(
+				instance3.getName() === 'baseLiteral:subLiteral:instance3',
+				'Inheritance occurs through multiple levels'
+			);
+				
+			ok(
+				instance3.uber.uber === baseLiteral, 
+				'Can access prototype chain through uber properties'
+			);
+			
+		});
+		
+	});
+
+</script>
+</head>
+<body>
+	<h1 id="qunit-header">QUnit test: oo.js</h1>
+	<h2 id="qunit-banner"></h2>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests">
+	</ol>
+
+
+
+</body>
+</html>
