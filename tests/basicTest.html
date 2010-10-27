@@ -37,17 +37,11 @@
 		
 		module("Basic tests for oo");	
 		test('Module and methods exist', function() {
-			expect(4);
+			expect(2);
 			
 			
 			ok(typeof Object.extend === 'function', "Object.extend method exists");
 			ok(typeof Object.create === 'function', "Object.create method exists");
-			
-			same(Object.extend, oo.extend,
-				'Using oo implentation');
-				
-			same(Object.create, oo.create,
-					'Using oo implentation');
 			
 		});
 		test('extends method', function() {
@@ -76,7 +70,7 @@
 			
 			ok(
 				extended.name === 'extendedAgain',
-				'Properties extended from multipe source objects.'
+				'Properties extended from multiple source objects.'
 				);
 			
 		});

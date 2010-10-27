@@ -37,7 +37,7 @@ var oo = function () {
 		return o;
 	}
 	
-	// augment Object if no native implimentation
+	// augment Object if no native implementation
 	if (typeof Object.extend !== 'function') {
 		Object.extend = extend;
 	}
@@ -45,7 +45,7 @@ var oo = function () {
 		Object.create = create;
 	}
 	
-	// publicise methods
+	// export public methods
 	return {
 		extend: extend, create: create
 	};
