@@ -1,37 +1,53 @@
 /*
-	oo.js - provides methods for using object-oriented patterns
+	oo.js - augment Object with static methods for using object-oriented patterns
 
 	@author		John Hunter for johnhunter.info
 	Created		2010-03-13
-	Modified	2010-03-23
+	Licence     CC-GNU LGPL <http://bit.ly/LGPL2>
 	
-	
+	Object.extend - follows signature of popular extend methods (Prototype, jQuery, etc)
+		except that inherited properties are not copied, and properies with undefined values are copied.
+		
+	Object.create - follows signature for ECMAScript 5 method.
 	
 */
-var oo = {
-	// augment target with properies of source, takes any number of source arguments
-	extend: function (target, source) {
+
+var oo = function () {
+	
+	function extend (target, source) {
 		var name, copy, undef;
 		for (var i = 1, len = arguments.length; i < len; i++) {
 			source = arguments[i];
 			for (name in source) {
-				copy = source[name];
-				if (copy !== undef) target[name] = copy;
+				if (source.hasOwnProperty(name)) {
+					target[name] = source[name];
+				}
 			}	
 		}
 		return target;
-	},
-	// return an object with proto instance as its prototype equivalent to ECMAScript 5 Object.create
-	create: function (proto) {
-		function F(){}
+	}
+	
+	function create (proto, properties) {
+		function F() {}
 		F.prototype = proto;
 		var o = new F();
-		o.uber = proto;
+		if (properties) {
+			Object.extend(o, properties);
+		}
 		return o;
-	},
-	// return object which inherits from proto and is extended by source properties
-	implement: function (proto, source) {
-		return oo.extend(oo.create(proto), source);
 	}
-};
+	
+	// augment Object if no native implimentation
+	if (typeof Object.extend !== 'function') {
+		Object.extend = extend;
+	}
+	if (typeof Object.create !== 'function') {
+		Object.create = create;
+	}
+	
+	// publicise methods
+	return {
+		extend: extend, create: create
+	};
+}();
 
