@@ -13,5 +13,6 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 	<dd>
 		returns an object that inherits from proto and is extended by properties. Has an uber property which is a ref to the prototype.
 	</dd>
+</dl>
 
 *Standing on the shoulders of giants: Docg Crockford, John Resig, Stoyan Stefanov.*
