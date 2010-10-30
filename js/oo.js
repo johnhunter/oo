@@ -1,14 +1,17 @@
 /*
-	oo.js - augment Object with static methods for using object-oriented patterns
+	oo.js - methods for using object-oriented patterns
 
 	@author		John Hunter for johnhunter.info
 	Created		2010-03-13
 	Licence     CC-GNU LGPL <http://bit.ly/LGPL2>
 	
-	Object.extend - follows signature of popular extend methods (Prototype, jQuery, etc)
+	CHANGED: removed binding to Object as these methods are not directly interchangable with ECMA 3.1, 5.
+	
+	oo.extend - follows signature of popular extend methods (Prototype, jQuery, etc)
 		except that inherited properties are not copied, and properies with undefined values are copied.
 		
-	Object.create - follows signature for ECMAScript 5 method.
+	oo.create - returns an object that inherits from proto and is extended by properties.
+		Has an uber property which is a ref to the prototype.
 	
 */
 
@@ -32,17 +35,10 @@ var oo = function () {
 		F.prototype = proto;
 		var o = new F();
 		if (properties) {
-			Object.extend(o, properties);
+			extend(o, properties);
 		}
+		o.uber = proto;
 		return o;
-	}
-	
-	// augment Object if no native implementation
-	if (typeof Object.extend !== 'function') {
-		Object.extend = extend;
-	}
-	if (typeof Object.create !== 'function') {
-		Object.create = create;
 	}
 	
 	// export public methods
@@ -50,4 +46,5 @@ var oo = function () {
 		extend: extend, create: create
 	};
 }();
+
 
