@@ -18,7 +18,7 @@
 var oo = function () {
 	
 	function extend (target, source) {
-		var name, copy, undef;
+		var name;
 		for (var i = 1, len = arguments.length; i < len; i++) {
 			source = arguments[i];
 			for (name in source) {

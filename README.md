@@ -15,4 +15,4 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 	</dd>
 </dl>
 
-*Standing on the shoulders of giants: Docg Crockford, John Resig, Stoyan Stefanov.*
+*Standing on the shoulders of giants: Doug Crockford, John Resig, Stoyan Stefanov.*
