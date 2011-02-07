@@ -15,7 +15,7 @@
 	oo.create - returns an object that inherits from proto and is extended by properties.
 		Has an uber property which is a ref to the prototype.
 		
-	oo.createClass (added v1.1) - returns a consructor function for a prototype which:
+	oo.createClass (added v1.1) - returns a constructor function for a prototype which:
 		inherits properties of the 'inherits' object
 		and is augmented by the methods object.
 		An initialize method (if defined) is called on instantation with constructor arguments.
