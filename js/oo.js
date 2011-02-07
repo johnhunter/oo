@@ -3,15 +3,22 @@
 
 	@author		John Hunter for johnhunter.info
 	Created		2010-03-13
-	Licence     CC-GNU LGPL <http://bit.ly/LGPL2>
+	@version    1.1 (2011-02-07)
 	
-	CHANGED: removed binding to Object as these methods are not directly interchangable with ECMA 3.1, 5.
+	Licenced under CC-BSD 2010, John Hunter
+	<http://creativecommons.org/licenses/BSD/>
+	
 	
 	oo.extend - follows signature of popular extend methods (Prototype, jQuery, etc)
 		except that inherited properties are not copied, and properies with undefined values are copied.
 		
 	oo.create - returns an object that inherits from proto and is extended by properties.
 		Has an uber property which is a ref to the prototype.
+		
+	oo.createClass (added v1.1) - returns a consructor function for a prototype which:
+		inherits properties of the 'inherits' object
+		and is augmented by the methods object.
+		An initialize method (if defined) is called on instantation with constructor arguments.
 	
 */
 
@@ -41,9 +48,27 @@ var oo = function () {
 		return o;
 	}
 	
+	function createClass (inherits, methods) {
+		var func,
+			proto = create(inherits, methods);
+			
+		func = function () {
+			var that = create(proto);
+			that.uber = proto.uber;
+			if (typeof that.initialize === 'function') {
+				that.initialize.apply(that, arguments);
+			}
+			return that;
+		};
+		func.prototype = proto;
+		proto.constructor = func;
+		return func;
+	}
+	
+	
 	// export public methods
 	return {
-		extend: extend, create: create
+		extend: extend, create: create, createClass: createClass
 	};
 }();
 
