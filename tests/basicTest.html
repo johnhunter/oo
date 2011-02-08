@@ -14,7 +14,11 @@
 <script type="text/javascript">
 	// --- Unittest Code goes here ---
 	
-	// testing data
+	
+	/*
+		Objects used in tests:
+	*/
+	
 	var baseLiteral = {
 		name: 'baseLiteral',
 		setName: function (name) {
@@ -35,16 +39,21 @@
 		}
 	};
 	
+	var toBeExtended = { name: 'toBeExtended' };
+	
+	
+	
 	
 	$(function() {
 		
 		module("Basic tests for oo");	
 		test('Module and methods exist', function() {
-			expect(3);
+			expect(4);
 			
 			ok(typeof oo === 'object', "oo module is an object");
 			ok(typeof oo.extend === 'function', "oo.extend method exists");
 			ok(typeof oo.create === 'function', "oo.create method exists");
+			ok(typeof oo.makeConstructor === 'function', "oo.makeConstructor method exists");
 			
 		});
 		test('extends method', function() {
@@ -55,8 +64,7 @@
 				'Copy properties to new object.'
 			);
 			
-			var toBeExtended = { name: 'toBeExtended' },
-				extended = oo.extend(toBeExtended, baseLiteral);
+			var extended = oo.extend(toBeExtended, baseLiteral);
 				
 			
 			ok(
@@ -65,8 +73,8 @@
 			);
 				
 			ok(
-				toBeExtended.hasOwnProperty('getThis'),
-				'Properties copied to target are not inherited.'
+				(toBeExtended.getThis() === toBeExtended && toBeExtended.hasOwnProperty('getThis')),
+				'Properties copied to target include inherited ones.'
 			);
 				
 			extended = oo.extend({}, baseLiteral, {name: 'extendedAgain'});
@@ -127,6 +135,58 @@
 			ok(
 				instance3.uber.uber === baseLiteral, 
 				'Can access prototype chain through uber properties'
+			);
+			
+		});
+		test('makeConstructor method', function () {
+			expect(6);
+			
+			var myConstructor = oo.makeConstructor(Object, {
+				initialize: function (name) {
+					this.setName(name);
+				},
+				setName: function (name) {
+					this.name = name;
+				},
+				getName: function () {
+					return this.name;
+				},
+				getThis: function () {
+					return this;
+				}
+			});
+			
+			var instance = myConstructor('Fred');
+			
+			
+			ok(
+				(typeof myConstructor === 'function'),
+				'Returns a constructor function.'
+			);
+			
+			ok(
+				typeof myConstructor.prototype.getThis  === 'function',
+				'Constructor function has correct prototype.'
+			);
+			
+			ok(
+				myConstructor === instance.constructor,
+				'Instance has correct constructor.'
+			);
+			
+			ok(
+				instance.uber === Object,
+				'Instance inherits from object passed to constructor factory.'
+			);
+			
+			ok(
+				instance.name === 'Fred',
+				'Instance is initialized correctly.'
+			);
+			
+			ok(
+				instance.getThis() === instance && instance.hasOwnProperty('getThis') ===  false,
+				'Instance has inherited methods.'
 			);
 			
 		});
