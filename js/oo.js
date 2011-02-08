@@ -9,30 +9,38 @@
 	<http://creativecommons.org/licenses/BSD/>
 	
 	
-	oo.extend - follows signature of popular extend methods (Prototype, jQuery, etc)
-		except that inherited properties are not copied, and properies with undefined values are copied.
+	oo.extend - copies all properties from sources to target object.
+		CHANGED (v1.1): now copies inherited properties, and properies with undefined values are NOT copied.
 		
 	oo.create - returns an object that inherits from proto and is extended by properties.
 		Has an uber property which is a ref to the prototype.
 		
-	oo.createClass (added v1.1) - returns a constructor function for a prototype which:
-		inherits properties of the 'inherits' object
-		and is augmented by the methods object.
-		An initialize method (if defined) is called on instantation with constructor arguments.
+	oo.makeConstructor (added v1.1) - factory method, returns an object constructor function.
+	The object is based on a prototype which:
+		inherits properties of the inheritsFrom argument
+		and is augmented by the methods argument.
+		An initialize method (if defined in methods) is called on instantation with constructor arguments.
 	
 */
 
 var oo = function () {
 	
 	function extend (target, source) {
-		var name;
-		for (var i = 1, len = arguments.length; i < len; i++) {
+		var name,
+			value,
+			undef,
+			i = 1,
+			len = arguments.length;
+		
+		while (i < len) {
 			source = arguments[i];
 			for (name in source) {
-				if (source.hasOwnProperty(name)) {
-					target[name] = source[name];
+				value = source[name];
+				if (value !== undef) {
+					target[name] = value;
 				}
-			}	
+			}
+			i++;
 		}
 		return target;
 	}
@@ -48,27 +56,23 @@ var oo = function () {
 		return o;
 	}
 	
-	function createClass (inherits, methods) {
-		var func,
-			proto = create(inherits, methods);
-			
-		func = function () {
-			var that = create(proto);
-			that.uber = proto.uber;
+	function makeConstructor (inheritsFrom, methods) {
+		var func = function () {
+			var that = create(inheritsFrom, methods);
 			if (typeof that.initialize === 'function') {
 				that.initialize.apply(that, arguments);
 			}
 			return that;
 		};
-		func.prototype = proto;
-		proto.constructor = func;
 		return func;
 	}
 	
 	
-	// export public methods
+	// expose public methods
 	return {
-		extend: extend, create: create, createClass: createClass
+		extend: extend,
+		create: create,
+		makeConstructor: makeConstructor
 	};
 }();
 
