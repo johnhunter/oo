@@ -57,13 +57,19 @@ var oo = function () {
 	}
 	
 	function makeConstructor (inheritsFrom, methods) {
-		var func = function () {
-			var that = create(inheritsFrom, methods);
+		var func,
+			proto = create(inheritsFrom, methods);
+
+		func = function () {
+			var that = create(proto);
+			that.uber = proto.uber;
 			if (typeof that.initialize === 'function') {
 				that.initialize.apply(that, arguments);
 			}
 			return that;
 		};
+		func.prototype = proto;
+		proto.constructor = func;
 		return func;
 	}
 	
