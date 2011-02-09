@@ -4,22 +4,23 @@
 	@author		John Hunter for johnhunter.info
 	Created		2010-03-13
 	@version    1.1 (2011-02-07)
+	@see		<https://github.com/johnhunter/oo>
 	
 	Licenced under CC-BSD 2010, John Hunter
 	<http://creativecommons.org/licenses/BSD/>
 	
 	
 	oo.extend - copies all properties from sources to target object.
-		CHANGED (v1.1): now copies inherited properties, and properies with undefined values are NOT copied.
+		CHANGED (v1.1): now copies inherited properties, and properties with undefined values are NOT copied.
 		
 	oo.create - returns an object that inherits from proto and is extended by properties.
 		Has an uber property which is a ref to the prototype.
 		
 	oo.makeConstructor (added v1.1) - factory method, returns an object constructor function.
 	The object is based on a prototype which:
-		inherits properties of the inheritsFrom argument
-		and is augmented by the methods argument.
-		An initialize method (if defined in methods) is called on instantation with constructor arguments.
+		inherits properties of the inheritsFrom object
+		and is augmented by the properties object - normally methods but can be any properties.
+		An initialize method (if defined in properties) is called on instantation with constructor arguments.
 	
 */
 
@@ -56,9 +57,9 @@ var oo = function () {
 		return o;
 	}
 	
-	function makeConstructor (inheritsFrom, methods) {
+	function makeConstructor (inheritsFrom, properties) {
 		var func,
-			proto = create(inheritsFrom, methods);
+			proto = create(inheritsFrom, properties);
 
 		func = function () {
 			var that = create(proto);
