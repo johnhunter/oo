@@ -1,31 +1,173 @@
 # oo.js - object-oriented patterns #
 
 
-A simple helper for using Javascript inheritance patterns. Useful for prototypal inheritance and augmentation / mixins. The module was originally a polyfill for ECMA 3.1 & ECMA 5 but recreating Object.defineProperties seemed a pointless exercise.
+A simple helper for using Javascript inheritance patterns. Useful for prototypal inheritance and augmentation / mixins.  
+<https://github.com/johnhunter/oo>
+
 
 <dl>
-	<dt>oo.extend</dt>
+	<dt><b>oo.extend</b></dt>
 	<dd>
-		follows signature of popular extend methods (Prototype, jQuery, etc) except that inherited properties are not copied, and properties with undefined values are copied.
+		Copies all properties from source object[s] to target object. This is a destructive operation.
+			CHANGED (v1.1): now copies inherited properties, and properties with undefined values are NOT copied. This is more inline with behaviour of other implementations.
 	</dd>
 	
-	<dt>oo.create</dt>
+	<dt><b>oo.create</b></dt>
 	<dd>
-		returns an object that inherits from proto and is extended by properties. Has an uber property which is a ref to the prototype.
+		Returns an object that inherits from the proto argument and is extended by the properties argument. Returned object has an uber property which is a referenc to the proto.
 	</dd>
-	<dt>oo.createClass</dt>
+	<dt><b>oo.makeConstructor</b></dt>
 	<dd>
-		(added v1.1) returns a constructor function for a prototype which:
-		inherits properties of the 'inherits' object argument
-		and is augmented by the 'methods' object argument.
-		An initialize method (if defined) is called on instantation with constructor arguments.
+		(added v1.1) factory method, returns an object constructor function.
+		The object is based on a prototype which:
+			inherits properties of the inheritsFrom object
+			and is augmented by the properties object - normally containing methods but can be any properties.
+			An initialize method (if defined in properties) is called on instantation with the constructor arguments.
 	</dd>
 </dl>
 
+
 ## Use ##
 
-To be written.
+`targetObject` is extended with the `sourceObject`'s properties
 
+	oo.extend(targetObject, sourceObject[, sourceObjectN..]);
+	// properties are copied by reference...
+	// targetObject.foo === sourceObject.foo
+
+
+`newObject` inherits from the `prototypeObject` and is extended with the optional `propertiesObject`
+
+	var newObject = oo.create(prototypeObject [, propertiesObject]);
+	// newObject.uber === prototypeObject;
+
+
+`constructorFn` returns an objects that are `initialize`d and share a common prototype
+
+	var constructorFn = oo.makeConstructor(inheritsFromObject, {
+		initialize: function (prop) {
+			this.prop = prop;
+		},
+		// ... more methods
+	});
+	var instance = constructorFn(instancePropValue);
+	// instance.prop === instancePropValue
+
+
+## Description and rationale ##
+
+JavaScript is very much an object-oriented language. However it does not have classes. Newcomers to JavaScript familiar with a class-ical idiom find this hard. They are not helped because they are encouraged to approximate a class-like (pseudoclassical) behaviour using prototypes and the 'new' keyword. This is a crazy situation because they throw out the power of a dynamic multi-paradigm language and in turn are lumbered with an counterintuitive and misleading inheritance pattern that is nothing like classes.
+
+In JavaScript there is no class-object duality. If you want an object you just create one. If you want methods you can just bind functions to the object. When the function is invoked the 'this' property is bound to the object. Methods are just functions, the only difference is you call them in the context of an object. 
+
+So we can make objects and give them methods, but there are times when you want a set of objects to have the same behaviour. As its a dynamic language we could just copy the methods from one object to all the others. Note that objects (including functions) are passed by reference so copying only creates new references. But its still a little wasteful. We can have a set of objects share methods (or other properties) through a common object. That object is called the prototype. Each object has a property that gives access to a prototype object. Not all environments expose that property, but we can access through the prototype property of the object's constructor.
+
+Ok, so we don't have classes but we have constructors. And constructors have a 'prototype' property that points to an object that is the prototype for each object the constructor creates. If you assign methods to the prototype object of the constructor then they will be available to each instance via the prototype chain. Call any of those methods and their 'this' property will point to the instance from which it was called. ...Oh and by the way, a constructor is just another function. Calling a function with the 'new' operator will create an object, that inherits from the prototype, and will pass it to the function as 'this' before returning it.
+
+So the constructor creates the instance, and it will add a reference to the prototype object. But the prototype object is an entirely separate thing. So again - there are no classes in JavaScript - nothing like them.
+
+Now we can see why simulating classes in JavaScript is the fast lane to insanity. But we still want objects with common behaviour, and we want a nice and easy way to do it. Well JavaScript is a dynamic and extraordinarily expressive language - there's a whole bunch of ways to do this.
+
+### Mixins ###
+
+We can take an object and mixin properties from another object
+
+	var dog = {
+		legs: 4,
+		hasTail: true
+	};
+	
+	var fish = {
+		fins: 1,
+		hasTail: true,
+	}
+	
+	oo.extend(dog, fish);
+	
+	/* we get...
+	
+		dog {
+			legs: 4,
+			fins: 1,
+			hasTail: true
+		}
+	*/
+
+Not that useful. But we can mixin common behaviour...
+
+	var coastDweller = {
+		stomach: [],
+		energy: 0,
+		swim: function () {
+			this.speed = 3;
+			this.energy--;
+		}
+		eat: function (foodType) {
+			this.stomach.push(foodType);
+			this.energy++;
+		}
+	};
+	
+	oo.extend(dog, coastDweller);
+	oo.extend(fish, coastDweller);
+	
+	dog.eat(fish);
+	// dog.energy is 1
+	dog.swim();
+	// dog.energy is 0
+	
+	
+So we can mixin properties and behaviour at run time. These are all instance properties (although the methods are actually references to the `coastDweller` object).
+
+### Inheritance ###
+
+If we have an object that we want to use as a prototype for other objects we can use `oo.create`. This similar to the ES5 `Object.create` method. It hides the complexity (and pitfalls) of using a constructor function with `new` - so we have an easy way to get an object that inherits from another.
+
+	var fishes = [];
+	while (fishes.length < 10) {
+		fishes.push(oo.create(coastDweller));
+	}
+	
+	fishes[4].eat(fishes[3]);
+	fishes[4].swim();
+	
+We can have all the fishes share coastDweller behaviour. When we call the eat method JavaScript looks for eat in the instance object. It doesn't find an eat property so it then looks further up the prototype chain and finds the reference to the eat function in `coastDweller`. It then calls the `eat` function and within the function the `this` property points to the fishes instance.
+
+As well as shared behaviour we might want instances to have instance properties. We can pass oo.create a properties object that is mixed into the newly created instance:
+
+	var bigFish = oo.create(coastDweller, { name: 'big fish', size: 3 });
+	
+So `bigFish` inherits from `coastDweller` and has some instance properties of its own. Useful but not quite there as an alternative to a class.
+
+### Constructor factory ###
+
+What we really want is a constructor that will create instance objects with their own instance properties but that share a common prototype object. The `oo.makeConstructor` is a factory that makes a constructor function. You tell it what to inherit from, and give it a set of properties (usually methods). It creates and stores an object which is uses as the prototype for the instances it constructs.
+
+	var Fishes = oo.makeConstructor(coastDweller, {
+		initialize: function (name, size) {
+			this.name = name;
+			this.size = size || 1;
+		},
+		dive: function () {
+			this.energy -= this.size;
+		}
+	});
+	
+	var bigFish = Fishes('big fish', 3);
+	bigFish.dive();
+
+This will be familiar territory if you are used to classes. However the focus here is on the instance constructor. The factory has created a prototype shared across all the instances it creates. And if you define a method called `initialize` it will call this method when the constructor is called - passing any arguments provided to the constructor.
+
+*	So we can share common behaviour by using an object as a prototype.
+*	We can mixin behaviour and inherit from common ancestors.
+*	We have a factory for constructors that initialize instances. 
+
+And all without any classes - because of course they don't exist.
+
+## License ##
+
+Licenced under CC-BSD 2010, John Hunter  
+<http://creativecommons.org/licenses/BSD/>
 
 
 *Standing on the shoulders of giants: Doug Crockford, John Resig, Stoyan Stefanov.*
