@@ -31,20 +31,20 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 
 ## Use ##
 
-`targetObject` is extended with the `sourceObject`'s properties
+targetObject is extended with the sourceObject's properties
 
 	oo.extend(targetObject, sourceObject[, sourceObjectN..]);
 	// properties are copied by reference...
 	// targetObject.foo === sourceObject.foo
 
 
-`newObject` inherits from the `prototypeObject` and is extended with the optional `propertiesObject`
+newObject inherits from the prototypeObject and is extended with the optional propertiesObject
 
 	var newObject = oo.create(prototypeObject [, propertiesObject]);
 	// newObject.uber === prototypeObject;
 
 
-`constructorFn` returns an objects that are `initialize`d and share a common prototype
+constructorFn returns an object that is initialized and share a common prototype
 
 	var constructorFn = oo.makeConstructor(inheritsFromObject, {
 		initialize: function (prop) {
@@ -58,11 +58,16 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 
 ## Description and rationale ##
 
-JavaScript is very much an object-oriented language. However it does not have classes. Newcomers to JavaScript familiar with a class-ical idiom find this hard. They are not helped because they are encouraged to approximate a class-like (pseudoclassical) behaviour using prototypes and the 'new' keyword. This is a crazy situation because they throw out the power of a dynamic multi-paradigm language and in turn are lumbered with an counterintuitive and misleading inheritance pattern that is nothing like classes.
+JavaScript is very much an object-oriented language. However it does not have classes. Newcomers to JavaScript familiar with a class-ical idiom can find this challenging. They are not helped because they are encouraged to approximate a class-like (pseudoclassical) behaviour using prototypes and the 'new' keyword. This is a crazy situation because they throw out the power of a dynamic multi-paradigm language and in turn are lumbered with a counterintuitive and misleading inheritance pattern that is nothing like classes.
 
-In JavaScript there is no class-object duality. If you want an object you just create one. If you want methods you can just bind functions to the object. When the function is invoked the 'this' property is bound to the object. Methods are just functions, the only difference is you call them in the context of an object. 
+In JavaScript there is no class-object duality. If you want an object you just create one. If you want methods you can just bind functions to the object. When the function is invoked the 'this' property is bound to the object. Methods are just functions, the only difference is you call them in the context of an object. I.E. a function only acts as a method of an object at the point you invoke it. With such a dynamic language the idea of a class just doesn't make sense.
 
-So we can make objects and give them methods, but there are times when you want a set of objects to have the same behaviour. As its a dynamic language we could just copy the methods from one object to all the others. Note that objects (including functions) are passed by reference so copying only creates new references. But its still a little wasteful. We can have a set of objects share methods (or other properties) through a common object. That object is called the prototype. Each object has a property that gives access to a prototype object. Not all environments expose that property, but we can access through the prototype property of the object's constructor.
+So we can make objects and give them methods by binding functions to them, but there are times when you want a set of objects to have the same behaviour. As its a dynamic language we could just copy the methods from one object to all the others. Note that objects (including functions) are passed by reference so copying only creates new references. But its still a little wasteful. We can have a set of objects share methods (or other properties) through a common object - called a prototype. Each object has a property that gives access to a prototype object. Not all environments expose that property, but we can access it through the prototype property of the object's constructor.
+
+	var obj = { name: 'foo' };
+	obj.getName(); // TypeError: obj.getName is not a function
+	Object.prototype.getName = function () { return this.name };
+	obj.getName(); // returns "foo"
 
 Ok, so we don't have classes but we have constructors. And constructors have a 'prototype' property that points to an object that is the prototype for each object the constructor creates. If you assign methods to the prototype object of the constructor then they will be available to each instance via the prototype chain. Call any of those methods and their 'this' property will point to the instance from which it was called. ...Oh and by the way, a constructor is just another function. Calling a function with the 'new' operator will create an object, that inherits from the prototype, and will pass it to the function as 'this' before returning it.
 
@@ -72,7 +77,7 @@ Now we can see why simulating classes in JavaScript is the fast lane to insanity
 
 ### Mixins ###
 
-We can take an object and mixin properties from another object
+We can take an object and mixin properties from another object with the oo.extend method (you might recognise this from libraries like jQuery).
 
 	var dog = {
 		legs: 4,
@@ -119,7 +124,7 @@ Not that useful. But we can mixin common behaviour...
 	// dog.energy is 0
 	
 	
-So we can mixin properties and behaviour at run time. These are all instance properties (although the methods are actually references to the `coastDweller` object).
+So we can mixin properties and behaviour at run time. These are all instance properties (although the methods are actually references to the `coastDweller` object properties).
 
 ### Inheritance ###
 
