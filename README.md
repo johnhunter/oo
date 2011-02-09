@@ -6,23 +6,25 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 
 
 <dl>
-	<dt><b>oo.extend</b></dt>
+	<dt><b>oo.extend(target, source)</b></dt>
 	<dd>
-		Copies all properties from source object[s] to target object. This is a destructive operation.
-			CHANGED (v1.1): now copies inherited properties, and properties with undefined values are NOT copied. This is more inline with behaviour of other implementations.
+		Copies all properties from source object[s] to target object. This is a destructive operation.<br>
+		CHANGED (v1.1): now copies inherited properties, and properties with undefined values are NOT copied. This is more inline with behaviour of other implementations.
 	</dd>
 	
-	<dt><b>oo.create</b></dt>
+	<dt><b>oo.create(proto, properties)</b></dt>
 	<dd>
-		Returns an object that inherits from the proto argument and is extended by the properties argument. Returned object has an uber property which is a referenc to the proto.
+		Returns an object that inherits from the proto object and is extended by the properties object. Returned object has an uber property which is a reference to the proto.
 	</dd>
-	<dt><b>oo.makeConstructor</b></dt>
+	<dt><b>oo.makeConstructor(inheritsFrom, properties)</b></dt>
 	<dd>
 		(added v1.1) factory method, returns an object constructor function.
 		The object is based on a prototype which:
-			inherits properties of the inheritsFrom object
-			and is augmented by the properties object - normally containing methods but can be any properties.
-			An initialize method (if defined in properties) is called on instantation with the constructor arguments.
+		<ul>
+			<li>inherits properties of the inheritsFrom object</li>
+			<li>and is augmented by the properties object - normally containing methods but can be any properties</li>
+			<li>an initialize method (if defined in properties) is called on instantation with the constructor arguments</li>
+		</ul>
 	</dd>
 </dl>
 
