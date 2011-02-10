@@ -24,7 +24,7 @@
 	
 */
 
-var oo = function () {
+var oo = (function () {
 	
 	function extend (target, source) {
 		var name,
@@ -81,6 +81,6 @@ var oo = function () {
 		create: create,
 		makeConstructor: makeConstructor
 	};
-}();
+}());
 
 
