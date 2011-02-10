@@ -31,20 +31,28 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 
 ## Use ##
 
-targetObject is extended with the sourceObject's properties
+**targetObject is extended with the sourceObject's properties:**
 
 	oo.extend(targetObject, sourceObject[, sourceObjectN..]);
-	// properties are copied by reference...
-	// targetObject.foo === sourceObject.foo
+
+*	Returns the `targetObject`. This method is destructive.
+*	You can use any number of `sourceObjects` and they will be copied (rightmost overwrites previous).
+*	Object properties (objects, functions, etc) are copied by reference so `targetObject.foo === sourceObject.foo`.
+*	To create a new object use `oo.extend({}, sourceObject);`.
+*	This method uses memory due to copying, but run-time property lookup is fastest.
 
 
-newObject inherits from the prototypeObject and is extended with the optional propertiesObject
+**newObject inherits from the prototypeObject and is extended with the optional propertiesObject:**
 
 	var newObject = oo.create(prototypeObject [, propertiesObject]);
-	// newObject.uber === prototypeObject;
+
+*	Returns a new object.
+*	Returned object has an `uber` property that is a reference to the `prototypeObject`.
+*	This method uses less memory but run-time property lookup is slower for prototype properties. 
 
 
-constructorFn returns an object that is initialized and share a common prototype
+
+**constructorFn returns an object that is initialized and share a common prototype:**
 
 	var constructorFn = oo.makeConstructor(inheritsFromObject, {
 		initialize: function (prop) {
@@ -53,8 +61,12 @@ constructorFn returns an object that is initialized and share a common prototype
 		// ... more methods
 	});
 	var instance = constructorFn(instancePropValue);
-	// instance.prop === instancePropValue
-
+	
+*	Returns a constructor function.
+*	Constructor arguments are passed to the `initialize` method if one is defined - used to define instance properties.
+*	`initialize` method can call the `inheritsFrom.initialize` via the uber property (equivalent to super), e.g: `this.uber.initialize(arguments)`
+*	If the prototype does not inherit (equivalent to a base class) then set the inheritFrom to the Object constructor: `oo.makeConstructor(Object, { ... });`
+*	This method uses least memory, but run-time property lookup is slowest since it has 2 jumps to make up the prototype chain (its own proto, and the inheritsFrom object).
 
 ## Description and rationale ##
 
@@ -170,6 +182,10 @@ This will be familiar territory if you are used to classes. However the focus he
 *	We have a factory for constructors that initialize instances. 
 
 And all without any classes - because of course they don't exist.
+
+## Performance issues ##
+
+In static compiled languages, like Java, deep inheritance chains are common. Inheritance is resolved during compilation and has no impact on run-time performance. In Javascript inheritance is resolved at *invocation* so deep chains have a run-time performance impact. Newer JITing interpreters do a good job of mitigation, but you should avoid deep inheritance where feasible and use more delegation or mixins.
 
 ## License ##
 
