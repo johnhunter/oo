@@ -11,7 +11,6 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 		Copies all properties from source object[s] to target object. This is a destructive operation.<br>
 		CHANGED (v1.1): now copies inherited properties, and properties with undefined values are NOT copied. This is more inline with behaviour of other implementations.
 	</dd>
-	
 	<dt><b>oo.create(proto, properties)</b></dt>
 	<dd>
 		Returns an object that inherits from the proto object and is extended by the properties object. Returned object has an uber property which is a reference to the proto.
