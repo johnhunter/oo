@@ -64,7 +64,7 @@ A simple helper for using Javascript inheritance patterns. Useful for prototypal
 *	Returns a constructor function.
 *	Constructor arguments are passed to the `initialize` method if one is defined - used to define instance properties.
 *	`initialize` method can call the `inheritsFrom.initialize` via the uber property (equivalent to super), e.g: `this.uber.initialize(arguments)`
-*	If the prototype does not inherit (equivalent to a base class) then set the inheritFrom to the Object constructor: `oo.makeConstructor(Object, { ... });`
+*	If the prototype does not inherit (equivalent to a base class) then set the inheritFrom to an empty object: `oo.makeConstructor({}, { ... });`
 *	This method uses least memory, but run-time property lookup is slowest since it has 2 jumps to make up the prototype chain (its own proto, and the inheritsFrom object).
 
 ## Description and rationale ##

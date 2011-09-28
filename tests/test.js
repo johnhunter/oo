@@ -130,7 +130,8 @@ test('create method with instance properties', function() {
 test('makeConstructor method', function () {
 	expect(6);
 	
-	var myConstructor = oo.makeConstructor(Object, {
+	var inheritedFrom = {};
+	var myConstructor = oo.makeConstructor(inheritedFrom, {
 		initialize: function (name) {
 			this.setName(name);
 		},
@@ -164,12 +165,12 @@ test('makeConstructor method', function () {
 	);
 	
 	ok(
-		instance.uber === Object,
+		instance.uber === inheritedFrom,
 		'Instance inherits from object passed to constructor factory.'
 	);
 	
 	ok(
-		instance.name === 'Fred',
+		instance.getName() === 'Fred',
 		'Instance is initialized correctly.'
 	);
 	
